@@ -18,7 +18,6 @@ tags:
 - name: Roles
 - name: Projects
 - name: Settings
-- name: Notifications
 - name: Audit
 - name: Events
 - name: System
@@ -735,59 +734,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-  /notifications:
-    get:
-      tags:
-      - Notifications
-      summary: List current user notifications
-      operationId: listNotifications
-      security:
-      - bearerAuth: []
-      parameters:
-      - name: read
-        in: query
-        schema:
-          type: boolean
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
-      responses:
-        '200':
-          description: Notifications
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotificationListResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-  /notifications/{notificationId}:
-    parameters:
-    - $ref: '#/components/parameters/NotificationId'
-    patch:
-      tags:
-      - Notifications
-      summary: Update notification
-      operationId: updateNotification
-      security:
-      - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateNotificationRequest'
-      responses:
-        '200':
-          description: Notification updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotificationResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
   /audit:
     get:
       tags:
@@ -1466,58 +1412,6 @@ components:
       type: object
       minProperties: 1
       additionalProperties: true
-    NotificationResponse:
-      type: object
-      required:
-      - id
-      - organizationId
-      - userId
-      - type
-      - title
-      - message
-      - read
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        organizationId:
-          type: string
-          format: uuid
-        userId:
-          type: string
-          format: uuid
-        type:
-          type: string
-        title:
-          type: string
-        message:
-          type: string
-        read:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-    NotificationListResponse:
-      type: object
-      required:
-      - items
-      - total
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/NotificationResponse'
-        total:
-          type: integer
-          minimum: 0
-    UpdateNotificationRequest:
-      type: object
-      required:
-      - read
-      properties:
-        read:
-          type: boolean
     AuditActor:
       type: object
       required:
