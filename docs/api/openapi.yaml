@@ -87,22 +87,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
+          headers:
+            Set-Cookie:
+              description: Sets the HttpOnly refresh-token cookie. Production deployments use Secure and SameSite=Strict.
+                Secure may be disabled only for local HTTP development.
+              schema:
+                type: string
+                example: fpm_refresh_token=<opaque-token>; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+      description: Authenticates a user with email and password. On success, returns a short-lived access JWT in the JSON
+        body and sets an opaque refresh token in the HttpOnly `fpm_refresh_token` cookie. The raw refresh token is never included
+        in JSON.
   /auth/refresh:
     post:
       tags:
       - Authentication
       summary: Refresh access token
       operationId: refreshToken
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RefreshTokenRequest'
       responses:
         '200':
           description: Token refreshed
@@ -110,10 +114,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+          headers:
+            Set-Cookie:
+              description: Replaces the refresh-token cookie with the newly rotated refresh token.
+              schema:
+                type: string
+                example: fpm_refresh_token=<new-opaque-token>; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict
         '401':
           $ref: '#/components/responses/Unauthorized'
+      security:
+      - refreshCookie: []
+      description: Rotates the refresh session using the HttpOnly refresh-token cookie. The request has no JSON body. On success,
+        the previously used refresh token is revoked, a new refresh token is issued in the cookie, and a new short-lived access
+        JWT is returned.
   /auth/logout:
     post:
       tags:
@@ -121,18 +134,20 @@ paths:
       summary: Logout current session
       operationId: logout
       security:
-      - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LogoutRequest'
+      - refreshCookie: []
       responses:
         '204':
           description: Logged out
+          headers:
+            Set-Cookie:
+              description: Expires the refresh-token cookie.
+              schema:
+                type: string
+                example: fpm_refresh_token=; Max-Age=0; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict
         '401':
           $ref: '#/components/responses/Unauthorized'
+      description: Revokes the refresh session identified by the HttpOnly refresh-token cookie and expires the cookie. The
+        request has no JSON body. The frontend must also discard any in-memory access token.
   /auth/me:
     get:
       tags:
@@ -817,6 +832,12 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    refreshCookie:
+      type: apiKey
+      in: cookie
+      name: fpm_refresh_token
+      description: Opaque refresh token stored by the browser as an HttpOnly cookie. The raw token is never returned in JSON
+        and must never be stored by frontend JavaScript.
   parameters:
     Page:
       name: page
@@ -923,34 +944,22 @@ components:
           type: string
           format: password
           minLength: 1
-    RefreshTokenRequest:
-      type: object
-      required:
-      - refreshToken
-      properties:
-        refreshToken:
-          type: string
-    LogoutRequest:
-      type: object
-      required:
-      - refreshToken
-      properties:
-        refreshToken:
-          type: string
     TokenResponse:
       type: object
       required:
       - accessToken
       - expiresIn
-      - refreshToken
       properties:
         accessToken:
           type: string
+          description: 'Short-lived JWT access token. The browser client must keep it in memory only and send it using Authorization:
+            Bearer.'
         expiresIn:
           type: integer
+          minimum: 1
           example: 900
-        refreshToken:
-          type: string
+          description: Access-token lifetime in seconds.
+      additionalProperties: false
     OrganizationSummary:
       type: object
       required:
