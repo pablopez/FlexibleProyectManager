@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: flexible-project-manager
+  profiles:
+    default: local
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+  flyway:
+    enabled: true
+    validate-on-migrate: true
+  jackson:
+    time-zone: UTC
+
+server:
+  error:
+    include-message: never

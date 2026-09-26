@@ -1,0 +1,25 @@
+package com.flexibleprojectmanager.platform.system.api;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.flexibleprojectmanager.platform.system.application.HealthService;
+
+@RestController
+@RequestMapping("/api/v1/system")
+public class SystemHealthController {
+
+    private final HealthService healthService;
+
+    public SystemHealthController(HealthService healthService) {
+        this.healthService = healthService;
+    }
+
+    @GetMapping("/health")
+    public ResponseEntity<HealthResponse> health() {
+        HealthService.HealthCheckResult result = healthService.check();
+        return ResponseEntity.status(result.status()).body(result.response());
+    }
+}
