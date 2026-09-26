@@ -795,15 +795,35 @@ paths:
     get:
       tags:
       - System
-      summary: Get system health
+      summary: Get public system health
       operationId: getSystemHealth
       responses:
         '200':
-          description: System health
+          description: Backend and database are available.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: UP
+                backend: UP
+                database: UP
+                timestamp: '2026-09-26T11:00:00Z'
+        '503':
+          description: Backend is responding but the database health check failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: DOWN
+                backend: UP
+                database: DOWN
+                timestamp: '2026-09-26T11:00:00Z'
+      description: Public lightweight readiness check used by the local web application and operational tooling. It is available
+        before first-run initialization and does not require authentication. The check validates that the backend is running
+        and that the configured database is reachable. It does not validate license state or business data.
+      security: []
 components:
   securitySchemes:
     bearerAuth:
@@ -1038,7 +1058,6 @@ components:
       required:
       - id
       - organizationId
-      - installationKey
       - name
       - platform
       - applicationVersion
@@ -1048,11 +1067,11 @@ components:
         id:
           type: string
           format: uuid
+          description: Stable backend-generated UUID identifying this installation. This value is not secret. It is referenced
+            as installationId by other resources such as licenses.
         organizationId:
           type: string
           format: uuid
-        installationKey:
-          type: string
         name:
           type: string
         platform:
@@ -1074,6 +1093,8 @@ components:
           - string
           - 'null'
           format: date-time
+      description: Represents a concrete application installation. Its id is the canonical installation identity; no separate
+        installation key or hardware-derived secret is used.
     UpdateInstallationRequest:
       type: object
       minProperties: 1
@@ -1131,7 +1152,8 @@ components:
           - string
           - 'null'
           format: uuid
-          description: Optional installation binding. Null means the license is organization-scoped.
+          description: Optional binding to the canonical Installation.id UUID. This identifier is public and is not a licensing
+            secret. Null means the license is organization-scoped.
         status:
           $ref: '#/components/schemas/LicenseStatus'
         type:
@@ -1546,15 +1568,28 @@ components:
           - DEGRADED
     HealthResponse:
       type: object
-      required:
-      - status
+      description: Minimal public health information. It intentionally does not expose database vendor, filesystem paths,
+        deployment mode, organization data, license information or application internals.
       properties:
         status:
+          $ref: '#/components/schemas/HealthComponentStatus'
+          description: Overall health. DOWN when the database is not reachable.
+        backend:
+          $ref: '#/components/schemas/HealthComponentStatus'
+          description: Backend process availability. If this response is returned, this value is UP.
+        database:
+          $ref: '#/components/schemas/HealthComponentStatus'
+          description: Whether the backend can successfully validate database connectivity.
+        timestamp:
           type: string
-          enum:
-          - UP
-          - DOWN
-          - DEGRADED
+          format: date-time
+          description: UTC time at which the health check was evaluated.
+      required:
+      - status
+      - backend
+      - database
+      - timestamp
+      additionalProperties: false
     SetupStatusResponse:
       type: object
       required:
@@ -1695,3 +1730,8 @@ components:
           $ref: '#/components/schemas/ThemeMode'
       minProperties: 1
       additionalProperties: false
+    HealthComponentStatus:
+      type: string
+      enum:
+      - UP
+      - DOWN
