@@ -662,7 +662,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SettingsResponse'
+                $ref: '#/components/schemas/UserSettingsResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
     patch:
@@ -677,63 +677,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateSettingsRequest'
+              $ref: '#/components/schemas/UpdateUserSettingsRequest'
       responses:
         '200':
           description: Updated user settings
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SettingsResponse'
+                $ref: '#/components/schemas/UserSettingsResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-  /settings/organization:
-    get:
-      tags:
-      - Settings
-      summary: Get organization settings
-      operationId: getOrganizationSettings
-      security:
-      - bearerAuth: []
-      responses:
-        '200':
-          description: Organization settings
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SettingsResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-    patch:
-      tags:
-      - Settings
-      summary: Update organization settings
-      operationId: updateOrganizationSettings
-      security:
-      - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateSettingsRequest'
-      responses:
-        '200':
-          description: Updated organization settings
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SettingsResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
   /audit:
     get:
       tags:
@@ -1405,13 +1360,6 @@ components:
           - string
           - 'null'
           maxLength: 2000
-    SettingsResponse:
-      type: object
-      additionalProperties: true
-    UpdateSettingsRequest:
-      type: object
-      minProperties: 1
-      additionalProperties: true
     AuditActor:
       type: object
       required:
@@ -1657,3 +1605,36 @@ components:
       - USER
       - VIEWER
       description: System-defined role code for MVP 0.1.
+    LanguageCode:
+      type: string
+      enum:
+      - es
+      - en
+      description: Supported UI language for MVP 0.1.
+    ThemeMode:
+      type: string
+      enum:
+      - light
+      - dark
+      - system
+      description: Supported UI theme mode for MVP 0.1.
+    UserSettingsResponse:
+      type: object
+      properties:
+        language:
+          $ref: '#/components/schemas/LanguageCode'
+        theme:
+          $ref: '#/components/schemas/ThemeMode'
+      required:
+      - language
+      - theme
+      additionalProperties: false
+    UpdateUserSettingsRequest:
+      type: object
+      properties:
+        language:
+          $ref: '#/components/schemas/LanguageCode'
+        theme:
+          $ref: '#/components/schemas/ThemeMode'
+      minProperties: 1
+      additionalProperties: false
