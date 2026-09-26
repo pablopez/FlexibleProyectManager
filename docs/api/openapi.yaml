@@ -269,6 +269,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+      description: Returns the currently installed and validated license. Returns 404 when no license is installed.
   /license/activate:
     post:
       tags:
@@ -298,6 +299,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '409':
           $ref: '#/components/responses/Conflict'
+      description: Validates and activates a compact JWS license signed with Ed25519 (alg=EdDSA). The backend validates signature,
+        organization binding, optional installation binding, validity dates and replacement rules before activation.
   /license/deactivate:
     post:
       tags:
@@ -315,6 +318,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+      description: Removes/deactivates the currently installed license from this deployment. Existing application data remains
+        accessible according to product policy.
   /license/entitlements:
     get:
       tags:
@@ -334,6 +339,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+      description: Returns effective features and limits derived from the current license.
   /users:
     get:
       tags:
@@ -1062,6 +1068,7 @@ components:
       - EXPIRED
       - REVOKED
       - INVALID
+      description: Effective license validation status.
     LicenseType:
       type: string
       enum:
@@ -1069,33 +1076,41 @@ components:
       - SUBSCRIPTION
       - PERPETUAL
       - DEVELOPMENT
+      description: Supported license type for MVP 0.1.
     LicenseLimits:
       type: object
       properties:
-        users:
+        maxUsers:
           type:
           - integer
           - 'null'
-          minimum: 0
-        workers:
+          minimum: 1
+          description: Maximum number of active users allowed. Null means unlimited.
+        maxInstallations:
           type:
           - integer
           - 'null'
-          minimum: 0
-        installations:
-          type:
-          - integer
-          - 'null'
-          minimum: 0
+          minimum: 1
+          description: Maximum number of installations allowed. Null means unlimited.
+      required:
+      - maxUsers
+      - maxInstallations
+      additionalProperties: false
     LicenseResponse:
       type: object
-      required:
-      - status
-      - type
-      - issuedAt
-      - features
-      - limits
       properties:
+        licenseId:
+          type: string
+          format: uuid
+        organizationId:
+          type: string
+          format: uuid
+        installationId:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Optional installation binding. Null means the license is organization-scoped.
         status:
           $ref: '#/components/schemas/LicenseStatus'
         type:
@@ -1108,36 +1123,56 @@ components:
           - string
           - 'null'
           format: date-time
+          description: Required for expiring licenses. Null is allowed for perpetual licenses.
         features:
           type: array
+          uniqueItems: true
           items:
             type: string
+            pattern: ^[a-z][a-z0-9.-]*$
+          description: Server-defined feature codes enabled by the license.
         limits:
           $ref: '#/components/schemas/LicenseLimits'
-    ActivateLicenseRequest:
-      type: object
-      required:
-      - license
-      properties:
-        license:
+        signatureAlgorithm:
           type: string
-          description: Signed license payload
-    EntitlementsResponse:
-      type: object
+          const: Ed25519
+          description: Cryptographic algorithm used to validate the signed license.
       required:
+      - licenseId
+      - organizationId
+      - status
+      - type
+      - issuedAt
+      - expiresAt
       - features
       - limits
+      - signatureAlgorithm
+      additionalProperties: false
+    ActivateLicenseRequest:
+      type: object
+      properties:
+        signedLicense:
+          type: string
+          minLength: 1
+          description: License encoded as a compact JWS signed with Ed25519 (JWS alg=EdDSA). The application validates it
+            using a trusted public key.
+      required:
+      - signedLicense
+      additionalProperties: false
+    EntitlementsResponse:
+      type: object
       properties:
         features:
           type: object
           additionalProperties:
             type: boolean
+          description: Effective feature availability after license validation.
         limits:
-          type: object
-          additionalProperties:
-            type:
-            - integer
-            - 'null'
+          $ref: '#/components/schemas/LicenseLimits'
+      required:
+      - features
+      - limits
+      additionalProperties: false
     UserStatus:
       type: string
       enum:
