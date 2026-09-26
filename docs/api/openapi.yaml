@@ -750,13 +750,34 @@ paths:
       - bearerAuth: []
       responses:
         '200':
-          description: SSE event stream
+          description: Continuous SSE stream. Each event uses the standard SSE fields id, event and data. The data field contains
+            a JSON-serialized ApplicationEvent.
+          headers:
+            Cache-Control:
+              description: SSE responses should not be cached.
+              schema:
+                type: string
+                example: no-cache
           content:
             text/event-stream:
               schema:
                 type: string
+                example: 'id: 550e8400-e29b-41d4-a716-446655440000\nevent: PROJECT_UPDATED\ndata: {"id":"550e8400-e29b-41d4-a716-446655440000","type":"PROJECT_UPDATED","timestamp":"2026-09-26T08:00:00Z","payload":{}}\n\n'
         '401':
           $ref: '#/components/responses/Unauthorized'
+      description: 'Subscribes the authenticated client to application events using Server-Sent Events (SSE). Clients must
+        send the JWT access token using the Authorization: Bearer header. The web client must use a fetch-based SSE implementation
+        rather than the native EventSource API, so the Authorization header can be sent explicitly. Each SSE data field contains
+        a JSON-serialized ApplicationEvent. Clients may send Last-Event-ID when reconnecting.'
+      parameters:
+      - name: Last-Event-ID
+        in: header
+        required: false
+        description: Identifier of the last application event received by the client. May be supplied when reconnecting. Replay
+          is best-effort in MVP 0.1 and is not a durable event-log guarantee.
+        schema:
+          type: string
+          format: uuid
   /system/info:
     get:
       tags:
@@ -1495,6 +1516,7 @@ components:
         payload:
           type: object
           additionalProperties: true
+      description: Transient application event delivered to authenticated clients. Persistence is not guaranteed in MVP 0.1.
     SystemInfoResponse:
       type: object
       required:
