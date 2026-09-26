@@ -778,19 +778,6 @@ paths:
         schema:
           type: string
           format: uuid
-  /system/info:
-    get:
-      tags:
-      - System
-      summary: Get system information
-      operationId: getSystemInfo
-      responses:
-        '200':
-          description: System information
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SystemInfoResponse'
   /system/health:
     get:
       tags:
@@ -1539,33 +1526,6 @@ components:
           type: object
           additionalProperties: true
       description: Transient application event delivered to authenticated clients. Persistence is not guaranteed in MVP 0.1.
-    SystemInfoResponse:
-      type: object
-      required:
-      - version
-      - deployment
-      - database
-      - status
-      properties:
-        version:
-          type: string
-        deployment:
-          type: string
-          enum:
-          - DESKTOP
-          - CLOUD
-          - ENTERPRISE
-        database:
-          type: string
-          enum:
-          - SQLITE
-          - POSTGRESQL
-        status:
-          type: string
-          enum:
-          - STARTING
-          - READY
-          - DEGRADED
     HealthResponse:
       type: object
       description: Minimal public health information. It intentionally does not expose database vendor, filesystem paths,
