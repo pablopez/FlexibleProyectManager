@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import com.flexibleprojectmanager.platform.system.application.DatabaseHealthProbe;
 import com.flexibleprojectmanager.platform.system.application.HealthService;
+import com.flexibleprojectmanager.platform.system.application.HealthService.HealthStatus;
 
 class HealthServiceTest {
 
@@ -23,10 +24,9 @@ class HealthServiceTest {
 
         HealthService.HealthCheckResult result = new HealthService(probe, clock).check();
 
-        assertThat(result.status().value()).isEqualTo(503);
-        assertThat(result.response().status()).hasToString("DOWN");
-        assertThat(result.response().backend()).hasToString("UP");
-        assertThat(result.response().database()).hasToString("DOWN");
-        assertThat(result.response().timestamp()).isEqualTo(Instant.parse("2026-09-26T11:00:00Z"));
+        assertThat(result.status()).isEqualTo(HealthStatus.DOWN);
+        assertThat(result.backend()).isEqualTo(HealthStatus.UP);
+        assertThat(result.database()).isEqualTo(HealthStatus.DOWN);
+        assertThat(result.timestamp()).isEqualTo(Instant.parse("2026-09-26T11:00:00Z"));
     }
 }

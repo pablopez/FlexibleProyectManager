@@ -3,12 +3,8 @@ package com.flexibleprojectmanager.platform.system.application;
 import java.time.Clock;
 import java.time.Instant;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.flexibleprojectmanager.platform.system.api.HealthComponentStatus;
-import com.flexibleprojectmanager.platform.system.api.HealthResponse;
+import org.springframework.stereotype.Service;
 
 @Service
 public class HealthService {
@@ -28,22 +24,25 @@ public class HealthService {
 
     public HealthCheckResult check() {
         boolean databaseAvailable = databaseHealthProbe.isAvailable();
-        HealthComponentStatus databaseStatus = databaseAvailable
-                ? HealthComponentStatus.UP
-                : HealthComponentStatus.DOWN;
-        HealthComponentStatus overallStatus = databaseAvailable
-                ? HealthComponentStatus.UP
-                : HealthComponentStatus.DOWN;
+        HealthStatus databaseStatus = databaseAvailable ? HealthStatus.UP : HealthStatus.DOWN;
+        HealthStatus overallStatus = databaseAvailable ? HealthStatus.UP : HealthStatus.DOWN;
 
-        HealthResponse response = new HealthResponse(
+        return new HealthCheckResult(
                 overallStatus,
-                HealthComponentStatus.UP,
+                HealthStatus.UP,
                 databaseStatus,
                 Instant.now(clock));
-
-        return new HealthCheckResult(response, databaseAvailable ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE);
     }
 
-    public record HealthCheckResult(HealthResponse response, HttpStatus status) {
+    public enum HealthStatus {
+        UP,
+        DOWN
+    }
+
+    public record HealthCheckResult(
+            HealthStatus status,
+            HealthStatus backend,
+            HealthStatus database,
+            Instant timestamp) {
     }
 }

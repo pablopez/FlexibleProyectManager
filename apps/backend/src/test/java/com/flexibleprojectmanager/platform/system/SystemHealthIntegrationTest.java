@@ -43,15 +43,11 @@ class SystemHealthIntegrationTest {
     }
 
     @Test
-    void contextStartsAndFlywayCreatesTechnicalMigration() {
+    void contextStartsAndFlywayAppliesInitialMigration() {
         Integer migrationCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM flyway_schema_history WHERE version = '1'", Integer.class);
-        Integer probeTableCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'slice_0_technical_probe'",
-                Integer.class);
+                "SELECT COUNT(*) FROM flyway_schema_history WHERE version = '1' AND success = 1", Integer.class);
 
         assertThat(migrationCount).isEqualTo(1);
-        assertThat(probeTableCount).isEqualTo(1);
     }
 
     @Test

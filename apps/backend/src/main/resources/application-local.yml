@@ -1,0 +1,9 @@
+app:
+  database:
+    path: ${FPM_DATABASE_PATH:${user.home}/.flexible-project-manager/flexible-project-manager.sqlite}
+
+spring:
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+  flyway:
+    locations: classpath:db/migration/sqlite

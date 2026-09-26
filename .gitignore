@@ -47,11 +47,6 @@ logs/
 **/target/
 *.class
 
-# Spring Boot local overrides
-application-local.properties
-application-local.yml
-application-local.yaml
-
 # Java crash logs
 hs_err_pid*
 replay_pid*
