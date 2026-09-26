@@ -2,51 +2,48 @@ openapi: 3.1.0
 info:
   title: Flexible Project Manager API
   version: 0.1.0
-  description:
-    Initial API contract for Flexible Project Manager. This version defines the reusable Platform Core including
+  description: Initial API contract for Flexible Project Manager. This version defines the reusable Platform Core including
     setup, authentication, organization, installation, licensing, users, roles, projects, settings, notifications, audit,
     events and system information.
 servers:
-  - url: http://localhost:8080/api/v1
-    description: Local development
+- url: http://localhost:8080/api/v1
+  description: Local development
 tags:
-  - name: Setup
-  - name: Authentication
-  - name: Organization
-  - name: Installation
-  - name: License
-  - name: Users
-  - name: Roles
-  - name: Projects
-  - name: Settings
-  - name: Notifications
-  - name: Audit
-  - name: Events
-  - name: System
+- name: Setup
+- name: Authentication
+- name: Organization
+- name: Installation
+- name: License
+- name: Users
+- name: Roles
+- name: Projects
+- name: Settings
+- name: Notifications
+- name: Audit
+- name: Events
+- name: System
 paths:
   /setup/status:
     get:
       tags:
-        - Setup
+      - Setup
       summary: Get one-time setup status
-      description:
-        Public endpoint used before authentication to determine whether the local installation has already been
+      description: Public endpoint used before authentication to determine whether the local installation has already been
         initialized.
       operationId: getSetupStatus
       responses:
-        "200":
+        '200':
           description: Current setup status
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SetupStatusResponse"
+                $ref: '#/components/schemas/SetupStatusResponse'
   /setup/initialize:
     post:
       tags:
-        - Setup
+      - Setup
       summary: Initialize a fresh local installation
-      description:
-        One-time unauthenticated operation. Atomically creates the organization, installation, initial system roles
+      description: One-time unauthenticated operation. Atomically creates the organization, installation, initial system roles
         and permissions, administrator user and administrator membership. The operation is rejected after the system has been
         initialized.
       operationId: initializeSetup
@@ -55,27 +52,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/InitializeSetupRequest"
+              $ref: '#/components/schemas/InitializeSetupRequest'
       responses:
-        "201":
+        '201':
           description: Installation initialized successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SetupInitializationResponse"
-        "400":
+                $ref: '#/components/schemas/SetupInitializationResponse'
+        '400':
           description: Invalid setup data
           content: &id001
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "409":
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
           description: System is already initialized
           content: *id001
   /auth/login:
     post:
       tags:
-        - Authentication
+      - Authentication
       summary: Authenticate user
       operationId: login
       requestBody:
@@ -83,22 +80,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LoginRequest"
+              $ref: '#/components/schemas/LoginRequest'
       responses:
-        "200":
+        '200':
           description: Authenticated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TokenResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /auth/refresh:
     post:
       tags:
-        - Authentication
+      - Authentication
       summary: Refresh access token
       operationId: refreshToken
       requestBody:
@@ -106,779 +103,779 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RefreshTokenRequest"
+              $ref: '#/components/schemas/RefreshTokenRequest'
       responses:
-        "200":
+        '200':
           description: Token refreshed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TokenResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /auth/logout:
     post:
       tags:
-        - Authentication
+      - Authentication
       summary: Logout current session
       operationId: logout
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LogoutRequest"
+              $ref: '#/components/schemas/LogoutRequest'
       responses:
-        "204":
+        '204':
           description: Logged out
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /auth/me:
     get:
       tags:
-        - Authentication
+      - Authentication
       summary: Get current user
       operationId: getCurrentUser
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: Current user
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CurrentUserResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+                $ref: '#/components/schemas/CurrentUserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /organization:
     get:
       tags:
-        - Organization
+      - Organization
       summary: Get current organization
       operationId: getOrganization
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: Organization
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OrganizationResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/OrganizationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
       tags:
-        - Organization
+      - Organization
       summary: Update current organization
       operationId: updateOrganization
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateOrganizationRequest"
+              $ref: '#/components/schemas/UpdateOrganizationRequest'
       responses:
-        "200":
+        '200':
           description: Organization updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OrganizationResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/OrganizationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /installation:
     get:
       tags:
-        - Installation
+      - Installation
       summary: Get installation
       operationId: getInstallation
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: Installation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/InstallationResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/InstallationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
       tags:
-        - Installation
+      - Installation
       summary: Update installation
       operationId: updateInstallation
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateInstallationRequest"
+              $ref: '#/components/schemas/UpdateInstallationRequest'
       responses:
-        "200":
+        '200':
           description: Installation updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/InstallationResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/InstallationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /license:
     get:
       tags:
-        - License
+      - License
       summary: Get active license
       operationId: getLicense
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: License
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LicenseResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/LicenseResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /license/activate:
     post:
       tags:
-        - License
+      - License
       summary: Activate a signed license
       operationId: activateLicense
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ActivateLicenseRequest"
+              $ref: '#/components/schemas/ActivateLicenseRequest'
       responses:
-        "200":
+        '200':
           description: License activated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LicenseResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "409":
-          $ref: "#/components/responses/Conflict"
+                $ref: '#/components/schemas/LicenseResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
   /license/deactivate:
     post:
       tags:
-        - License
+      - License
       summary: Deactivate current license
       operationId: deactivateLicense
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       responses:
-        "204":
+        '204':
           description: License deactivated
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /license/entitlements:
     get:
       tags:
-        - License
+      - License
       summary: Get effective entitlements
       operationId: getEntitlements
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: Effective features and limits
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EntitlementsResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
+                $ref: '#/components/schemas/EntitlementsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /users:
     get:
       tags:
-        - Users
+      - Users
       summary: List users
       operationId: listUsers
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/Page"
-        - $ref: "#/components/parameters/Size"
-        - name: status
-          in: query
-          schema:
-            $ref: "#/components/schemas/UserStatus"
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/UserStatus'
       responses:
-        "200":
+        '200':
           description: Users
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserListResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
+                $ref: '#/components/schemas/UserListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
     post:
       tags:
-        - Users
+      - Users
       summary: Create user
       operationId: createUser
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateUserRequest"
+              $ref: '#/components/schemas/CreateUserRequest'
       responses:
-        "201":
+        '201':
           description: User created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "409":
-          $ref: "#/components/responses/Conflict"
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
   /users/{userId}:
     parameters:
-      - $ref: "#/components/parameters/UserId"
+    - $ref: '#/components/parameters/UserId'
     get:
       tags:
-        - Users
+      - Users
       summary: Get user
       operationId: getUser
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: User
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
       tags:
-        - Users
+      - Users
       summary: Update user
       operationId: updateUser
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateUserRequest"
+              $ref: '#/components/schemas/UpdateUserRequest'
       responses:
-        "200":
+        '200':
           description: User updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
   /users/{userId}/roles:
     parameters:
-      - $ref: "#/components/parameters/UserId"
+    - $ref: '#/components/parameters/UserId'
     put:
       tags:
-        - Users
+      - Users
       summary: Replace user roles
       operationId: replaceUserRoles
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateUserRolesRequest"
+              $ref: '#/components/schemas/UpdateUserRolesRequest'
       responses:
-        "200":
+        '200':
           description: Updated user
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /roles:
     get:
       tags:
-        - Roles
+      - Roles
       summary: List system roles
       operationId: listRoles
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: Roles
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RoleListResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
+                $ref: '#/components/schemas/RoleListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /projects:
     get:
       tags:
-        - Projects
+      - Projects
       summary: List projects
       operationId: listProjects
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/Page"
-        - $ref: "#/components/parameters/Size"
-        - name: status
-          in: query
-          schema:
-            $ref: "#/components/schemas/ProjectStatus"
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/ProjectStatus'
       responses:
-        "200":
+        '200':
           description: Projects
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProjectListResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
+                $ref: '#/components/schemas/ProjectListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
     post:
       tags:
-        - Projects
+      - Projects
       summary: Create project
       operationId: createProject
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateProjectRequest"
+              $ref: '#/components/schemas/CreateProjectRequest'
       responses:
-        "201":
+        '201':
           description: Project created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProjectResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "409":
-          $ref: "#/components/responses/Conflict"
+                $ref: '#/components/schemas/ProjectResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
   /projects/{projectId}:
     parameters:
-      - $ref: "#/components/parameters/ProjectId"
+    - $ref: '#/components/parameters/ProjectId'
     get:
       tags:
-        - Projects
+      - Projects
       summary: Get project
       operationId: getProject
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: Project
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProjectResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/ProjectResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
       tags:
-        - Projects
+      - Projects
       summary: Update project
       operationId: updateProject
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateProjectRequest"
+              $ref: '#/components/schemas/UpdateProjectRequest'
       responses:
-        "200":
+        '200':
           description: Project updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProjectResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
+                $ref: '#/components/schemas/ProjectResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
   /projects/{projectId}/archive:
     parameters:
-      - $ref: "#/components/parameters/ProjectId"
+    - $ref: '#/components/parameters/ProjectId'
     post:
       tags:
-        - Projects
+      - Projects
       summary: Archive project
       operationId: archiveProject
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: Project archived
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProjectResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
+                $ref: '#/components/schemas/ProjectResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
   /projects/{projectId}/restore:
     parameters:
-      - $ref: "#/components/parameters/ProjectId"
+    - $ref: '#/components/parameters/ProjectId'
     post:
       tags:
-        - Projects
+      - Projects
       summary: Restore project
       operationId: restoreProject
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: Project restored
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProjectResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
+                $ref: '#/components/schemas/ProjectResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
   /settings/user:
     get:
       tags:
-        - Settings
+      - Settings
       summary: Get current user settings
       operationId: getUserSettings
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: User settings
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SettingsResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+                $ref: '#/components/schemas/SettingsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
     patch:
       tags:
-        - Settings
+      - Settings
       summary: Update current user settings
       operationId: updateUserSettings
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateSettingsRequest"
+              $ref: '#/components/schemas/UpdateSettingsRequest'
       responses:
-        "200":
+        '200':
           description: Updated user settings
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SettingsResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+                $ref: '#/components/schemas/SettingsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /settings/organization:
     get:
       tags:
-        - Settings
+      - Settings
       summary: Get organization settings
       operationId: getOrganizationSettings
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: Organization settings
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SettingsResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
+                $ref: '#/components/schemas/SettingsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
     patch:
       tags:
-        - Settings
+      - Settings
       summary: Update organization settings
       operationId: updateOrganizationSettings
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateSettingsRequest"
+              $ref: '#/components/schemas/UpdateSettingsRequest'
       responses:
-        "200":
+        '200':
           description: Updated organization settings
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SettingsResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
+                $ref: '#/components/schemas/SettingsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /notifications:
     get:
       tags:
-        - Notifications
+      - Notifications
       summary: List current user notifications
       operationId: listNotifications
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       parameters:
-        - name: read
-          in: query
-          schema:
-            type: boolean
-        - $ref: "#/components/parameters/Page"
-        - $ref: "#/components/parameters/Size"
+      - name: read
+        in: query
+        schema:
+          type: boolean
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
       responses:
-        "200":
+        '200':
           description: Notifications
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NotificationListResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+                $ref: '#/components/schemas/NotificationListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /notifications/{notificationId}:
     parameters:
-      - $ref: "#/components/parameters/NotificationId"
+    - $ref: '#/components/parameters/NotificationId'
     patch:
       tags:
-        - Notifications
+      - Notifications
       summary: Update notification
       operationId: updateNotification
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateNotificationRequest"
+              $ref: '#/components/schemas/UpdateNotificationRequest'
       responses:
-        "200":
+        '200':
           description: Notification updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NotificationResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/NotificationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /audit:
     get:
       tags:
-        - Audit
+      - Audit
       summary: Query audit log
       operationId: listAuditEntries
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       parameters:
-        - name: userId
-          in: query
-          schema:
-            type: string
-            format: uuid
-        - name: action
-          in: query
-          schema:
-            type: string
-        - name: resourceType
-          in: query
-          schema:
-            type: string
-        - name: from
-          in: query
-          schema:
-            type: string
-            format: date-time
-        - name: to
-          in: query
-          schema:
-            type: string
-            format: date-time
-        - $ref: "#/components/parameters/Page"
-        - $ref: "#/components/parameters/Size"
+      - name: userId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: action
+        in: query
+        schema:
+          type: string
+      - name: resourceType
+        in: query
+        schema:
+          type: string
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
       responses:
-        "200":
+        '200':
           description: Audit entries
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuditListResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
+                $ref: '#/components/schemas/AuditListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /events:
     get:
       tags:
-        - Events
+      - Events
       summary: Subscribe to application events using Server-Sent Events
       operationId: subscribeToEvents
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: SSE event stream
           content:
             text/event-stream:
               schema:
                 type: string
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /system/info:
     get:
       tags:
-        - System
+      - System
       summary: Get system information
       operationId: getSystemInfo
       responses:
-        "200":
+        '200':
           description: System information
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SystemInfoResponse"
+                $ref: '#/components/schemas/SystemInfoResponse'
   /system/health:
     get:
       tags:
-        - System
+      - System
       summary: Get system health
       operationId: getSystemHealth
       responses:
-        "200":
+        '200':
           description: System health
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/HealthResponse"
+                $ref: '#/components/schemas/HealthResponse'
 components:
   securitySchemes:
     bearerAuth:
@@ -928,40 +925,40 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
     Unauthorized:
       description: Unauthorized
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
     Forbidden:
       description: Forbidden
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
     NotFound:
       description: Not found
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
     Conflict:
       description: Conflict
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
     ErrorResponse:
       type: object
       required:
-        - code
-        - message
-        - status
-        - timestamp
-        - path
+      - code
+      - message
+      - status
+      - timestamp
+      - path
       properties:
         code:
           type: string
@@ -981,8 +978,8 @@ components:
     LoginRequest:
       type: object
       required:
-        - email
-        - password
+      - email
+      - password
       properties:
         email:
           type: string
@@ -994,23 +991,23 @@ components:
     RefreshTokenRequest:
       type: object
       required:
-        - refreshToken
+      - refreshToken
       properties:
         refreshToken:
           type: string
     LogoutRequest:
       type: object
       required:
-        - refreshToken
+      - refreshToken
       properties:
         refreshToken:
           type: string
     TokenResponse:
       type: object
       required:
-        - accessToken
-        - expiresIn
-        - refreshToken
+      - accessToken
+      - expiresIn
+      - refreshToken
       properties:
         accessToken:
           type: string
@@ -1022,8 +1019,8 @@ components:
     OrganizationSummary:
       type: object
       required:
-        - id
-        - name
+      - id
+      - name
       properties:
         id:
           type: string
@@ -1033,12 +1030,12 @@ components:
     CurrentUserResponse:
       type: object
       required:
-        - id
-        - email
-        - displayName
-        - organization
-        - roles
-        - permissions
+      - id
+      - email
+      - displayName
+      - organization
+      - roles
+      - permissions
       properties:
         id:
           type: string
@@ -1049,11 +1046,11 @@ components:
         displayName:
           type: string
         organization:
-          $ref: "#/components/schemas/OrganizationSummary"
+          $ref: '#/components/schemas/OrganizationSummary'
         roles:
           type: array
-          items:
-            type: string
+          items: &id002
+            $ref: '#/components/schemas/RoleCode'
         permissions:
           type: array
           items:
@@ -1061,16 +1058,16 @@ components:
     OrganizationStatus:
       type: string
       enum:
-        - ACTIVE
-        - DISABLED
+      - ACTIVE
+      - DISABLED
     OrganizationResponse:
       type: object
       required:
-        - id
-        - name
-        - status
-        - createdAt
-        - updatedAt
+      - id
+      - name
+      - status
+      - createdAt
+      - updatedAt
       properties:
         id:
           type: string
@@ -1079,10 +1076,10 @@ components:
           type: string
         slug:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         status:
-          $ref: "#/components/schemas/OrganizationStatus"
+          $ref: '#/components/schemas/OrganizationStatus'
         createdAt:
           type: string
           format: date-time
@@ -1099,26 +1096,26 @@ components:
           maxLength: 200
         slug:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
           maxLength: 100
     InstallationStatus:
       type: string
       enum:
-        - ACTIVE
-        - DISABLED
-        - UNLICENSED
+      - ACTIVE
+      - DISABLED
+      - UNLICENSED
     InstallationResponse:
       type: object
       required:
-        - id
-        - organizationId
-        - installationKey
-        - name
-        - platform
-        - applicationVersion
-        - status
-        - createdAt
+      - id
+      - organizationId
+      - installationKey
+      - name
+      - platform
+      - applicationVersion
+      - status
+      - createdAt
       properties:
         id:
           type: string
@@ -1133,21 +1130,21 @@ components:
         platform:
           type: string
           enum:
-            - WINDOWS
-            - LINUX
-            - CLOUD
-            - OTHER
+          - WINDOWS
+          - LINUX
+          - CLOUD
+          - OTHER
         applicationVersion:
           type: string
         status:
-          $ref: "#/components/schemas/InstallationStatus"
+          $ref: '#/components/schemas/InstallationStatus'
         createdAt:
           type: string
           format: date-time
         lastSeenAt:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
           format: date-time
     UpdateInstallationRequest:
       type: object
@@ -1160,66 +1157,66 @@ components:
     LicenseStatus:
       type: string
       enum:
-        - ACTIVE
-        - EXPIRED
-        - REVOKED
-        - INVALID
+      - ACTIVE
+      - EXPIRED
+      - REVOKED
+      - INVALID
     LicenseType:
       type: string
       enum:
-        - TRIAL
-        - SUBSCRIPTION
-        - PERPETUAL
-        - DEVELOPMENT
+      - TRIAL
+      - SUBSCRIPTION
+      - PERPETUAL
+      - DEVELOPMENT
     LicenseLimits:
       type: object
       properties:
         users:
           type:
-            - integer
-            - "null"
+          - integer
+          - 'null'
           minimum: 0
         workers:
           type:
-            - integer
-            - "null"
+          - integer
+          - 'null'
           minimum: 0
         installations:
           type:
-            - integer
-            - "null"
+          - integer
+          - 'null'
           minimum: 0
     LicenseResponse:
       type: object
       required:
-        - status
-        - type
-        - issuedAt
-        - features
-        - limits
+      - status
+      - type
+      - issuedAt
+      - features
+      - limits
       properties:
         status:
-          $ref: "#/components/schemas/LicenseStatus"
+          $ref: '#/components/schemas/LicenseStatus'
         type:
-          $ref: "#/components/schemas/LicenseType"
+          $ref: '#/components/schemas/LicenseType'
         issuedAt:
           type: string
           format: date-time
         expiresAt:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
           format: date-time
         features:
           type: array
           items:
             type: string
         limits:
-          $ref: "#/components/schemas/LicenseLimits"
+          $ref: '#/components/schemas/LicenseLimits'
     ActivateLicenseRequest:
       type: object
       required:
-        - license
+      - license
       properties:
         license:
           type: string
@@ -1227,8 +1224,8 @@ components:
     EntitlementsResponse:
       type: object
       required:
-        - features
-        - limits
+      - features
+      - limits
       properties:
         features:
           type: object
@@ -1238,23 +1235,23 @@ components:
           type: object
           additionalProperties:
             type:
-              - integer
-              - "null"
+            - integer
+            - 'null'
     UserStatus:
       type: string
       enum:
-        - ACTIVE
-        - DISABLED
+      - ACTIVE
+      - DISABLED
     UserResponse:
       type: object
       required:
-        - id
-        - email
-        - displayName
-        - status
-        - roles
-        - createdAt
-        - updatedAt
+      - id
+      - email
+      - displayName
+      - status
+      - roles
+      - createdAt
+      - updatedAt
       properties:
         id:
           type: string
@@ -1265,11 +1262,10 @@ components:
         displayName:
           type: string
         status:
-          $ref: "#/components/schemas/UserStatus"
+          $ref: '#/components/schemas/UserStatus'
         roles:
           type: array
-          items:
-            type: string
+          items: *id002
         createdAt:
           type: string
           format: date-time
@@ -1278,24 +1274,36 @@ components:
           format: date-time
     UserListResponse:
       type: object
-      required:
-        - items
-        - total
       properties:
         items:
           type: array
           items:
-            $ref: "#/components/schemas/UserResponse"
+            $ref: '#/components/schemas/UserResponse'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
         total:
           type: integer
           minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+      required:
+      - items
+      - page
+      - size
+      - total
+      - totalPages
     CreateUserRequest:
       type: object
       required:
-        - email
-        - displayName
-        - password
-        - roles
+      - email
+      - displayName
+      - password
+      - roles
       properties:
         email:
           type: string
@@ -1311,8 +1319,8 @@ components:
         roles:
           type: array
           minItems: 1
-          items:
-            type: string
+          uniqueItems: true
+          items: *id002
     UpdateUserRequest:
       type: object
       minProperties: 1
@@ -1322,33 +1330,31 @@ components:
           minLength: 1
           maxLength: 200
         status:
-          $ref: "#/components/schemas/UserStatus"
+          $ref: '#/components/schemas/UserStatus'
     UpdateUserRolesRequest:
       type: object
       required:
-        - roles
+      - roles
       properties:
         roles:
           type: array
           minItems: 1
           uniqueItems: true
-          items:
-            type: string
+          items: *id002
     RoleResponse:
       type: object
       required:
-        - code
-        - name
-        - permissions
+      - code
+      - name
+      - permissions
       properties:
-        code:
-          type: string
+        code: *id002
         name:
           type: string
         description:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         permissions:
           type: array
           items:
@@ -1356,27 +1362,27 @@ components:
     RoleListResponse:
       type: object
       required:
-        - items
+      - items
       properties:
         items:
           type: array
           items:
-            $ref: "#/components/schemas/RoleResponse"
+            $ref: '#/components/schemas/RoleResponse'
     ProjectStatus:
       type: string
       enum:
-        - ACTIVE
-        - ARCHIVED
+      - ACTIVE
+      - ARCHIVED
     ProjectResponse:
       type: object
       required:
-        - id
-        - organizationId
-        - name
-        - status
-        - createdBy
-        - createdAt
-        - updatedAt
+      - id
+      - organizationId
+      - name
+      - status
+      - createdBy
+      - createdAt
+      - updatedAt
       properties:
         id:
           type: string
@@ -1388,10 +1394,10 @@ components:
           type: string
         description:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         status:
-          $ref: "#/components/schemas/ProjectStatus"
+          $ref: '#/components/schemas/ProjectStatus'
         createdBy:
           type: string
           format: uuid
@@ -1403,21 +1409,33 @@ components:
           format: date-time
     ProjectListResponse:
       type: object
-      required:
-        - items
-        - total
       properties:
         items:
           type: array
           items:
-            $ref: "#/components/schemas/ProjectResponse"
+            $ref: '#/components/schemas/ProjectResponse'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
         total:
           type: integer
           minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+      required:
+      - items
+      - page
+      - size
+      - total
+      - totalPages
     CreateProjectRequest:
       type: object
       required:
-        - name
+      - name
       properties:
         name:
           type: string
@@ -1425,8 +1443,8 @@ components:
           maxLength: 200
         description:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
           maxLength: 2000
     UpdateProjectRequest:
       type: object
@@ -1438,8 +1456,8 @@ components:
           maxLength: 200
         description:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
           maxLength: 2000
     SettingsResponse:
       type: object
@@ -1451,14 +1469,14 @@ components:
     NotificationResponse:
       type: object
       required:
-        - id
-        - organizationId
-        - userId
-        - type
-        - title
-        - message
-        - read
-        - createdAt
+      - id
+      - organizationId
+      - userId
+      - type
+      - title
+      - message
+      - read
+      - createdAt
       properties:
         id:
           type: string
@@ -1483,28 +1501,28 @@ components:
     NotificationListResponse:
       type: object
       required:
-        - items
-        - total
+      - items
+      - total
       properties:
         items:
           type: array
           items:
-            $ref: "#/components/schemas/NotificationResponse"
+            $ref: '#/components/schemas/NotificationResponse'
         total:
           type: integer
           minimum: 0
     UpdateNotificationRequest:
       type: object
       required:
-        - read
+      - read
       properties:
         read:
           type: boolean
     AuditActor:
       type: object
       required:
-        - id
-        - displayName
+      - id
+      - displayName
       properties:
         id:
           type: string
@@ -1514,63 +1532,67 @@ components:
     AuditEntryResponse:
       type: object
       required:
-        - id
-        - action
-        - resourceType
-        - createdAt
+      - id
+      - action
+      - resourceType
+      - createdAt
       properties:
         id:
           type: string
           format: uuid
         actor:
           anyOf:
-            - $ref: "#/components/schemas/AuditActor"
-            - type: "null"
+          - $ref: '#/components/schemas/AuditActor'
+          - type: 'null'
         action:
           type: string
         resourceType:
           type: string
         resourceId:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
           format: uuid
         metadata:
           type:
-            - object
-            - "null"
+          - object
+          - 'null'
           additionalProperties: true
         createdAt:
           type: string
           format: date-time
     AuditListResponse:
       type: object
-      required:
-        - items
-        - total
-        - page
-        - size
       properties:
         items:
           type: array
           items:
-            $ref: "#/components/schemas/AuditEntryResponse"
-        total:
-          type: integer
-          minimum: 0
+            $ref: '#/components/schemas/AuditEntryResponse'
         page:
           type: integer
           minimum: 0
         size:
           type: integer
           minimum: 1
+        total:
+          type: integer
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+      required:
+      - items
+      - page
+      - size
+      - total
+      - totalPages
     ApplicationEvent:
       type: object
       required:
-        - id
-        - type
-        - timestamp
-        - payload
+      - id
+      - type
+      - timestamp
+      - payload
       properties:
         id:
           type: string
@@ -1582,8 +1604,8 @@ components:
           format: date-time
         resource:
           type:
-            - object
-            - "null"
+          - object
+          - 'null'
           properties:
             type:
               type: string
@@ -1591,99 +1613,99 @@ components:
               type: string
               format: uuid
           required:
-            - type
-            - id
+          - type
+          - id
         payload:
           type: object
           additionalProperties: true
     SystemInfoResponse:
       type: object
       required:
-        - version
-        - deployment
-        - database
-        - status
+      - version
+      - deployment
+      - database
+      - status
       properties:
         version:
           type: string
         deployment:
           type: string
           enum:
-            - DESKTOP
-            - CLOUD
-            - ENTERPRISE
+          - DESKTOP
+          - CLOUD
+          - ENTERPRISE
         database:
           type: string
           enum:
-            - SQLITE
-            - POSTGRESQL
+          - SQLITE
+          - POSTGRESQL
         status:
           type: string
           enum:
-            - STARTING
-            - READY
-            - DEGRADED
+          - STARTING
+          - READY
+          - DEGRADED
     HealthResponse:
       type: object
       required:
-        - status
+      - status
       properties:
         status:
           type: string
           enum:
-            - UP
-            - DOWN
-            - DEGRADED
+          - UP
+          - DOWN
+          - DEGRADED
     SetupStatusResponse:
       type: object
       required:
-        - initialized
+      - initialized
       properties:
         initialized:
           type: boolean
           description: Whether the one-time local setup has already completed.
           examples:
-            - false
+          - false
     SetupOrganizationRequest:
       type: object
       required:
-        - name
+      - name
       properties:
         name:
           type: string
           minLength: 1
           maxLength: 200
           examples:
-            - Example Studio
+          - Example Studio
     SetupInstallationRequest:
       type: object
       required:
-        - name
+      - name
       properties:
         name:
           type: string
           minLength: 1
           maxLength: 200
           examples:
-            - Main Workstation
+          - Main Workstation
     SetupAdministratorRequest:
       type: object
       required:
-        - email
-        - displayName
-        - password
+      - email
+      - displayName
+      - password
       properties:
         email:
           type: string
           format: email
           examples:
-            - admin@example.com
+          - admin@example.com
         displayName:
           type: string
           minLength: 1
           maxLength: 200
           examples:
-            - Administrator
+          - Administrator
         password:
           type: string
           format: password
@@ -1692,22 +1714,22 @@ components:
     InitializeSetupRequest:
       type: object
       required:
-        - organization
-        - installation
-        - administrator
+      - organization
+      - installation
+      - administrator
       properties:
         organization:
-          $ref: "#/components/schemas/SetupOrganizationRequest"
+          $ref: '#/components/schemas/SetupOrganizationRequest'
         installation:
-          $ref: "#/components/schemas/SetupInstallationRequest"
+          $ref: '#/components/schemas/SetupInstallationRequest'
         administrator:
-          $ref: "#/components/schemas/SetupAdministratorRequest"
+          $ref: '#/components/schemas/SetupAdministratorRequest'
     SetupAdministratorResponse:
       type: object
       required:
-        - id
-        - email
-        - displayName
+      - id
+      - email
+      - displayName
       properties:
         id:
           type: string
@@ -1720,17 +1742,24 @@ components:
     SetupInitializationResponse:
       type: object
       required:
-        - initialized
-        - organization
-        - installation
-        - administrator
+      - initialized
+      - organization
+      - installation
+      - administrator
       properties:
         initialized:
           type: boolean
           const: true
         organization:
-          $ref: "#/components/schemas/OrganizationSummary"
+          $ref: '#/components/schemas/OrganizationSummary'
         installation:
-          $ref: "#/components/schemas/InstallationResponse"
+          $ref: '#/components/schemas/InstallationResponse'
         administrator:
-          $ref: "#/components/schemas/SetupAdministratorResponse"
+          $ref: '#/components/schemas/SetupAdministratorResponse'
+    RoleCode:
+      type: string
+      enum:
+      - ADMIN
+      - USER
+      - VIEWER
+      description: System-defined role code for MVP 0.1.
